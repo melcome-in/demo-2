@@ -6,88 +6,30 @@
 gsap.registerPlugin(ScrollTrigger);
 
 /* =========================================================================
- * 1. ROMANTIC AMBIENT WEB AUDIO SYNTHESIZER (NO EXTERNAL MP3 REQUIRED)
- * Generates a warm, dreamy harp & velvet pad chord progression on open.
+ * 1. ROMANTIC BACKGROUND AUDIO PLAYER (public/images/Rose.mp3)
  * ========================================================================= */
 class RomanticAudioEngine {
   constructor() {
-    this.ctx = null;
+    this.audio = new Audio('public/images/Rose.mp3');
+    this.audio.loop = true;
+    this.audio.volume = 0.5;
     this.isPlaying = false;
-    this.intervalId = null;
-    this.masterGain = null;
-    // Romantic A-minor / F-major7 / C-major7 / G6 arpeggio notes (Hz)
-    this.chords = [
-      [220.00, 261.63, 329.63, 392.00, 493.88], // Am9
-      [174.61, 220.00, 261.63, 329.63, 440.00], // Fmaj7
-      [261.63, 329.63, 392.00, 493.88, 587.33], // Cmaj9
-      [196.00, 246.94, 293.66, 392.00, 493.88]  // G6
-    ];
-    this.chordIndex = 0;
-  }
-
-  init() {
-    if (this.ctx) return;
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    this.ctx = new AudioCtx();
-    this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.value = 0.16;
-    this.masterGain.connect(this.ctx.destination);
-  }
-
-  playNote(freq, delay, duration = 3.2) {
-    if (!this.ctx || !this.isPlaying) return;
-    const now = this.ctx.currentTime + delay;
-    const osc = this.ctx.createOscillator();
-    const subOsc = this.ctx.createOscillator();
-    const noteGain = this.ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, now);
-
-    subOsc.type = 'triangle';
-    subOsc.frequency.setValueAtTime(freq * 0.5, now);
-
-    noteGain.gain.setValueAtTime(0.0001, now);
-    noteGain.gain.exponentialRampToValueAtTime(0.18, now + 0.35);
-    noteGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-    osc.connect(noteGain);
-    subOsc.connect(noteGain);
-    noteGain.connect(this.masterGain);
-
-    osc.start(now);
-    subOsc.start(now);
-    osc.stop(now + duration + 0.1);
-    subOsc.stop(now + duration + 0.1);
-  }
-
-  triggerChord() {
-    if (!this.isPlaying) return;
-    const chord = this.chords[this.chordIndex % this.chords.length];
-    chord.forEach((freq, idx) => {
-      this.playNote(freq, idx * 0.42, 3.6);
-    });
-    this.chordIndex++;
   }
 
   start() {
-    this.init();
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
     if (this.isPlaying) return;
     this.isPlaying = true;
-    this.triggerChord();
-    this.intervalId = setInterval(() => this.triggerChord(), 3200);
     this.updateUI();
+    this.audio.play().catch((err) => {
+      console.warn('Audio playback failed:', err);
+      this.isPlaying = false;
+      this.updateUI();
+    });
   }
 
   stop() {
+    this.audio.pause();
     this.isPlaying = false;
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
     this.updateUI();
   }
 
@@ -155,48 +97,48 @@ function openEnvelopeSequence() {
     duration: 0.4,
     ease: 'power2.inOut'
   })
-  .to('#wax-seal', {
-    scale: 1.25,
-    opacity: 0,
-    duration: 0.35,
-    ease: 'back.in(2)'
-  }, '<0.1')
-  .to('#envelope-ribbon', {
-    scaleX: 0,
-    opacity: 0,
-    duration: 0.3,
-    ease: 'power2.in'
-  }, '<0.1')
-  // 2. 3D RotateX the envelope top flap open
-  .to('#envelope-flap', {
-    rotateX: 180,
-    duration: 0.85,
-    ease: 'power3.inOut',
-    onUpdate: function () {
-      if (this.progress() > 0.45) {
-        document.getElementById('envelope-flap').style.zIndex = '1';
+    .to('#wax-seal', {
+      scale: 1.25,
+      opacity: 0,
+      duration: 0.35,
+      ease: 'back.in(2)'
+    }, '<0.1')
+    .to('#envelope-ribbon', {
+      scaleX: 0,
+      opacity: 0,
+      duration: 0.3,
+      ease: 'power2.in'
+    }, '<0.1')
+    // 2. 3D RotateX the envelope top flap open
+    .to('#envelope-flap', {
+      rotateX: 180,
+      duration: 0.85,
+      ease: 'power3.inOut',
+      onUpdate: function () {
+        if (this.progress() > 0.45) {
+          document.getElementById('envelope-flap').style.zIndex = '1';
+        }
       }
-    }
-  })
-  // 3. Slide the inner invitation card upward out of the pocket
-  .to('#envelope-letter', {
-    y: -135,
-    scale: 1.04,
-    duration: 0.9,
-    ease: 'power3.out'
-  }, '-=0.35')
-  // 4. Smoothly fade out the envelope modal & zoom-reveal Hero section
-  .fromTo('#hero-card',
-    { scale: 0.88, opacity: 0 },
-    { scale: 1, opacity: 1, duration: 1.1, ease: 'power3.out' },
-    '-=0.2'
-  )
-  .to(envelopeOverlay, {
-    opacity: 0,
-    scale: 1.08,
-    duration: 0.85,
-    ease: 'power2.inOut'
-  }, '<');
+    })
+    // 3. Slide the inner invitation card upward out of the pocket
+    .to('#envelope-letter', {
+      y: -135,
+      scale: 1.04,
+      duration: 0.9,
+      ease: 'power3.out'
+    }, '-=0.35')
+    // 4. Smoothly fade out the envelope modal & zoom-reveal Hero section
+    .fromTo('#hero-card',
+      { scale: 0.88, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 1.1, ease: 'power3.out' },
+      '-=0.2'
+    )
+    .to(envelopeOverlay, {
+      opacity: 0,
+      scale: 1.08,
+      duration: 0.85,
+      ease: 'power2.inOut'
+    }, '<');
 }
 
 envelopeWrapper.addEventListener('click', openEnvelopeSequence);
@@ -298,60 +240,60 @@ function playCoupleRoseHandoff() {
     duration: 0.75,
     ease: 'power3.inOut'
   })
-  .to(floatingRoseContainer, {
-    opacity: 0,
-    duration: 0.15
-  })
-  .set('#handoff-rose', { opacity: 1 }, '<')
+    .to(floatingRoseContainer, {
+      opacity: 0,
+      duration: 0.15
+    })
+    .set('#handoff-rose', { opacity: 1 }, '<')
 
-  // Step 2: Groom bows gently and extends his arm to give the rose to the Bride
-  .to('#groom-upper-body', {
-    rotation: 12,
-    duration: 0.55,
-    ease: 'power2.out'
-  })
-  .to('#groom-arm', {
-    rotation: -14,
-    x: 12,
-    duration: 0.55,
-    ease: 'power2.out'
-  }, '<')
+    // Step 2: Groom bows gently and extends his arm to give the rose to the Bride
+    .to('#groom-upper-body', {
+      rotation: 12,
+      duration: 0.55,
+      ease: 'power2.out'
+    })
+    .to('#groom-arm', {
+      rotation: -14,
+      x: 12,
+      duration: 0.55,
+      ease: 'power2.out'
+    }, '<')
 
-  // Step 3: Bride reaches out, receives the rose, holds it close with glowing hearts & blush
-  .to('#bride-arm', {
-    rotation: 15,
-    duration: 0.45,
-    ease: 'power2.out'
-  }, '-=0.2')
-  .to('#handoff-rose', {
-    opacity: 0,
-    duration: 0.2
-  })
-  .to('#bride-received-rose', {
-    opacity: 1,
-    duration: 0.25
-  }, '<')
-  .to('#bride-arm', {
-    rotation: -18,
-    duration: 0.55,
-    ease: 'back.out(1.7)'
-  })
-  .to('#groom-upper-body', {
-    rotation: 0,
-    duration: 0.5,
-    ease: 'power2.inOut'
-  }, '<')
-  .to('#bride-blush', {
-    opacity: 0.85,
-    scale: 1.35,
-    duration: 0.4
-  }, '<')
-  .call(() => {
-    document.getElementById('couple-hearts').style.opacity = '1';
-    document.getElementById('climax-status-banner').innerHTML =
-      '&ldquo;Forever sealed with a Velvet Crimson Rose &mdash; Zayn &amp; Alizeh&rdquo;';
-    launchGrandFinaleConfetti();
-  });
+    // Step 3: Bride reaches out, receives the rose, holds it close with glowing hearts & blush
+    .to('#bride-arm', {
+      rotation: 15,
+      duration: 0.45,
+      ease: 'power2.out'
+    }, '-=0.2')
+    .to('#handoff-rose', {
+      opacity: 0,
+      duration: 0.2
+    })
+    .to('#bride-received-rose', {
+      opacity: 1,
+      duration: 0.25
+    }, '<')
+    .to('#bride-arm', {
+      rotation: -18,
+      duration: 0.55,
+      ease: 'back.out(1.7)'
+    })
+    .to('#groom-upper-body', {
+      rotation: 0,
+      duration: 0.5,
+      ease: 'power2.inOut'
+    }, '<')
+    .to('#bride-blush', {
+      opacity: 0.85,
+      scale: 1.35,
+      duration: 0.4
+    }, '<')
+    .call(() => {
+      document.getElementById('couple-hearts').style.opacity = '1';
+      document.getElementById('climax-status-banner').innerHTML =
+        '&ldquo;Forever sealed with a Velvet Crimson Rose &mdash; Zayn &amp; Alizeh&rdquo;';
+      launchGrandFinaleConfetti();
+    });
 }
 
 // Subtle continuous romantic breeze on the Bride's cathedral veil
@@ -607,7 +549,7 @@ const copyAddressBtn = document.getElementById('copy-address-btn');
 const copyAddressLabel = document.getElementById('copy-address-label');
 copyAddressBtn.addEventListener('click', () => {
   const address = document.getElementById('venue-address-text').textContent.trim();
-  navigator.clipboard.writeText(address).catch(() => {});
+  navigator.clipboard.writeText(address).catch(() => { });
   copyAddressLabel.textContent = 'Address Copied ✓';
   setTimeout(() => {
     copyAddressLabel.textContent = 'Copy Address';
@@ -737,4 +679,3 @@ window.addEventListener('DOMContentLoaded', () => {
   initScratchFoil();
   animateAmbientEmbers();
 });
-
