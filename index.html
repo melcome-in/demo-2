@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zayn &amp; Alizeh — The Velvet Crimson Wedding Invitation</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#0a0a0a',
+            charcoal: '#111111',
+            velvet: {
+              dark: '#4c0519',
+              DEFAULT: '#99001f',
+              ruby: '#be123c',
+              glow: '#e11d48',
+            },
+            champagne: {
+              light: '#f5e6c8',
+              DEFAULT: '#d4af37',
+              dark: '#aa821c',
+            },
+            silver: '#d1d5db',
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            editorial: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+          },
+          boxShadow: {
+            'crimson-glow': '0 0 35px -5px rgba(190, 18, 60, 0.45)',
+            'gold-glow': '0 0 25px -5px rgba(212, 175, 55, 0.35)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- GSAP & ScrollTrigger & Canvas Confetti -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="locked bg-velvet-vignette antialiased selection:bg-velvet selection:text-champagne-light">
+
+  <!-- ===================================================================== -->
+  <!-- AMBIENT BACKGROUND SPARKLE CANVAS                                     -->
+  <!-- ===================================================================== -->
+  <canvas id="ambient-bg-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-60"></canvas>
+
+  <!-- ===================================================================== -->
+  <!-- FLOATING AUDIO TOGGLE & NAVIGATION BAR                                -->
+  <!-- ===================================================================== -->
+  <header class="fixed top-0 left-0 right-0 z-50 px-4 sm:px-8 py-4 flex items-center justify-between pointer-events-none">
+    <!-- Couple Crest Mini Link -->
+    <a href="#hero" class="pointer-events-auto group flex items-center gap-2.5 bg-obsidian/80 backdrop-blur-md border border-champagne/25 px-4 py-2 rounded-full hover:border-champagne/60 transition-all">
+      <span class="font-serif text-sm tracking-widest gold-gradient-text font-semibold">Z &amp; A</span>
+      <span class="hidden sm:inline-block w-1 h-1 rounded-full bg-velvet-ruby"></span>
+      <span class="hidden sm:inline-block text-[11px] uppercase tracking-[0.2em] text-silver/80 group-hover:text-champagne-light transition-colors">12 . 12 . 2026</span>
+    </a>
+
+    <!-- Quick Section Nav (Desktop) -->
+    <nav class="hidden md:flex items-center gap-6 pointer-events-auto bg-obsidian/75 backdrop-blur-md border border-white/10 px-6 py-2 rounded-full text-xs uppercase tracking-[0.18em] text-silver/80">
+      <a href="#our-story" class="hover:text-champagne-light transition-colors">Our Story</a>
+      <a href="#events" class="hover:text-champagne-light transition-colors">Itinerary</a>
+      <a href="#scratch-section" class="hover:text-champagne-light transition-colors">The Date</a>
+      <a href="#venue" class="hover:text-champagne-light transition-colors">Venue</a>
+      <a href="#rsvp" class="text-champagne hover:text-champagne-light font-medium transition-colors">RSVP</a>
+    </nav>
+
+    <!-- Romantic Ambient Audio Mute/Unmute Button -->
+    <button
+      id="audio-toggle-btn"
+      type="button"
+      aria-label="Toggle Background Music"
+      class="pointer-events-auto flex items-center gap-2.5 bg-obsidian/85 backdrop-blur-md border border-champagne/35 hover:border-champagne px-4 py-2 rounded-full shadow-gold-glow transition-all duration-300 group"
+    >
+      <div id="eq-bars" class="flex items-end gap-0.5 h-4">
+        <span class="eq-bar eq-bar-1 h-1"></span>
+        <span class="eq-bar eq-bar-2 h-2"></span>
+        <span class="eq-bar eq-bar-3 h-1.5"></span>
+        <span class="eq-bar eq-bar-4 h-1"></span>
+      </div>
+      <span id="audio-label" class="text-[11px] uppercase tracking-[0.18em] text-champagne-light">Music Off</span>
+    </button>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- 2. ENVELOPE OPENING OVERLAY (FIRST INTERACTION)                       -->
+  <!-- ===================================================================== -->
+  <div
+    id="envelope-overlay"
+    class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-obsidian px-4 select-none overflow-hidden"
+    style="background: radial-gradient(circle at 50% 45%, rgba(153, 0, 31, 0.28) 0%, rgba(10, 10, 10, 0.98) 70%);"
+  >
+    <!-- Decorative Corner Filigree -->
+    <div class="absolute inset-4 sm:inset-8 border border-champagne/20 pointer-events-none rounded-sm">
+      <div class="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 border-champagne"></div>
+      <div class="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 border-champagne"></div>
+      <div class="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 border-champagne"></div>
+      <div class="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-champagne"></div>
+    </div>
+
+    <!-- Top Pre-header -->
+    <div id="envelope-header" class="text-center mb-8 z-10">
+      <p class="text-xs uppercase tracking-[0.35em] text-champagne/80 mb-2">Together With Their Families</p>
+      <h1 class="font-editorial italic text-2xl sm:text-4xl text-champagne-light">A Royal Velvet Celebration</h1>
+    </div>
+
+    <!-- 3D Interactive Envelope -->
+    <div class="envelope-perspective z-10 my-2">
+      <div id="envelope-interactive" class="envelope-wrapper group" role="button" tabindex="0" aria-label="Click to open wedding invitation">
+        <!-- Back of Envelope -->
+        <div class="envelope-back"></div>
+
+        <!-- Inner Letter Card that Slides Up -->
+        <div id="envelope-letter" class="envelope-letter">
+          <span class="text-[10px] uppercase tracking-[0.3em] text-champagne/80 mb-1">The Wedding Of</span>
+          <h2 class="font-serif text-2xl sm:text-3xl gold-gradient-text font-semibold tracking-wide">Zayn &amp; Alizeh</h2>
+          <div class="w-12 h-[1px] bg-gradient-to-r from-transparent via-velvet-glow to-transparent my-2"></div>
+          <p class="font-editorial italic text-sm sm:text-base text-silver/90">December 12th, 2026 &bull; Istanbul &amp; Dubai</p>
+        </div>
+
+        <!-- Left & Right Flaps -->
+        <div class="envelope-front-left"></div>
+        <div class="envelope-front-right"></div>
+
+        <!-- Velvet Crimson Ribbon Horizontal Band -->
+        <div id="envelope-ribbon" class="absolute left-0 right-0 top-[54%] h-3 -translate-y-1/2 bg-gradient-to-r from-velvet-dark via-velvet-ruby to-velvet-dark z-[5] shadow-md border-y border-champagne/30"></div>
+
+        <!-- Bottom Pocket -->
+        <div class="envelope-bottom-pocket">
+          <div class="absolute bottom-3 left-0 right-0 text-center">
+            <span class="text-[9px] uppercase tracking-[0.35em] text-champagne/60">Private Invitation</span>
+          </div>
+        </div>
+
+        <!-- Top Animating 3D Flap -->
+        <div id="envelope-flap" class="envelope-flap"></div>
+
+        <!-- Red Wax Seal with Gold Foil Monogram -->
+        <div id="wax-seal" class="wax-seal">
+          <div class="w-[54px] h-[54px] rounded-full border border-champagne/50 flex flex-col items-center justify-center">
+            <span class="font-serif text-xs font-bold tracking-tighter text-champagne-light drop-shadow">Z&amp;A</span>
+            <svg class="w-3 h-3 text-champagne mt-0.5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pulsing Prompt -->
+    <div id="envelope-prompt" class="mt-10 text-center z-10">
+      <button
+        id="open-invitation-btn"
+        type="button"
+        class="inline-flex items-center gap-3 px-7 py-3 rounded-full bg-velvet/30 border border-champagne/50 text-champagne-light text-xs uppercase tracking-[0.28em] shadow-crimson-glow animate-pulse hover:bg-velvet/50 transition-all"
+      >
+        <span class="w-2 h-2 rounded-full bg-velvet-glow animate-ping"></span>
+        Click to Open Our Invitation
+      </button>
+      <p class="text-[11px] text-silver/50 mt-3 tracking-widest uppercase">Best Experienced With Sound</p>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 3. FIXED FLOATING SVG ROSE & SCROLL TRACK                             -->
+  <!-- ===================================================================== -->
+  <div id="rose-scroll-track" aria-hidden="true"></div>
+
+  <div id="floating-rose-container" aria-hidden="true">
+    <div id="floating-rose-inner" class="relative w-16 h-24 sm:w-20 sm:h-28 flex items-center justify-center">
+      <!-- Subtle Crimson Halo Behind Rose -->
+      <div class="absolute inset-1 rounded-full bg-velvet-glow/30 blur-lg animate-pulse"></div>
+      <!-- Botanical-Grade Multi-Layered Realistic Velvet Crimson Rose SVG -->
+      <svg id="floating-rose-svg" viewBox="0 0 160 240" class="w-full h-full overflow-visible">
+        <defs>
+          <!-- Soft 3D Petal Depth Shadow -->
+          <filter id="petalShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2.5" stdDeviation="2.2" flood-color="#1a0006" flood-opacity="0.78" />
+          </filter>
+
+          <!-- Deep Shadow Base Petals -->
+          <radialGradient id="velvetDeep" cx="50%" cy="25%" r="75%">
+            <stop offset="0%" stop-color="#be123c" />
+            <stop offset="55%" stop-color="#6b0519" />
+            <stop offset="100%" stop-color="#240108" />
+          </radialGradient>
+
+          <!-- Mid Sculpted Velvet Petals -->
+          <radialGradient id="velvetMid" cx="45%" cy="22%" r="72%">
+            <stop offset="0%" stop-color="#fb7185" />
+            <stop offset="28%" stop-color="#e11d48" />
+            <stop offset="72%" stop-color="#881337" />
+            <stop offset="100%" stop-color="#3b030e" />
+          </radialGradient>
+
+          <!-- Sunlit Velvet Curl Highlights -->
+          <linearGradient id="velvetRimLight" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fecdd3" />
+            <stop offset="35%" stop-color="#f43f5e" />
+            <stop offset="85%" stop-color="#99001f" />
+            <stop offset="100%" stop-color="#4c0519" />
+          </linearGradient>
+
+          <!-- Inner Spiral Bud Heart -->
+          <radialGradient id="velvetHeart" cx="48%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#fda4af" />
+            <stop offset="30%" stop-color="#e11d48" />
+            <stop offset="70%" stop-color="#6b0519" />
+            <stop offset="100%" stop-color="#1f0006" />
+          </radialGradient>
+
+          <!-- Botanical Emerald & Gold-Bronze Leaf Gradient -->
+          <linearGradient id="botanicalLeaf" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2d6a3e" />
+            <stop offset="55%" stop-color="#14381f" />
+            <stop offset="100%" stop-color="#07170c" />
+          </linearGradient>
+
+          <!-- Woody Emerald & Champagne Stem Gradient -->
+          <linearGradient id="botanicalStem" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0f2916" />
+            <stop offset="45%" stop-color="#386641" />
+            <stop offset="80%" stop-color="#d4af37" />
+            <stop offset="100%" stop-color="#142e1b" />
+          </linearGradient>
+
+          <!-- Crystal Dewdrop Gradient -->
+          <radialGradient id="dewDropGrad" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+            <stop offset="45%" stop-color="#fecdd3" stop-opacity="0.65" />
+            <stop offset="100%" stop-color="#881337" stop-opacity="0.9" />
+          </radialGradient>
+
+          <!-- Reusable Master Botanical Rose Artwork (Used in Floating Rose & Couple Handoff) -->
+          <g id="botanical-rose-artwork">
+            <!-- 1. Sinuous Organic Rose Stem -->
+            <path d="M80 105 C76 142 85 182 77 226" stroke="url(#botanicalStem)" stroke-width="5.2" stroke-linecap="round" fill="none" />
+            <path d="M79 105 C75 142 84 182 76 226" stroke="#f5e6c8" stroke-width="0.8" stroke-opacity="0.45" stroke-linecap="round" fill="none" />
+
+            <!-- Rose Thorns (Crimson-Tipped) -->
+            <path d="M78 132 C70 130 67 125 69 124 C73 125 76 127 78 126 Z" fill="#99001f" stroke="#d4af37" stroke-width="0.5" />
+            <path d="M81 168 C89 165 92 160 90 159 C86 160 83 162 81 161 Z" fill="#99001f" stroke="#d4af37" stroke-width="0.5" />
+            <path d="M79 196 C71 194 69 189 71 188 C75 189 77 191 79 190 Z" fill="#99001f" stroke="#d4af37" stroke-width="0.5" />
+
+            <!-- 2. Left Compound Serrated Leaf & Golden Veins -->
+            <g transform="translate(77, 148) rotate(-8)">
+              <path d="M0 0 C-18 -14 -46 -12 -54 4 C-44 18 -18 20 0 4 Z" fill="url(#botanicalLeaf)" stroke="#d4af37" stroke-width="0.9" stroke-opacity="0.7" />
+              <!-- Leaf Veins -->
+              <path d="M-2 2 Q-26 0 -51 4" stroke="#d4af37" stroke-width="0.9" stroke-opacity="0.65" fill="none" />
+              <path d="M-16 1 L-24 -5 M-26 1 L-35 -4 M-18 3 L-27 9 M-30 3 L-39 8" stroke="#d4af37" stroke-width="0.6" stroke-opacity="0.5" fill="none" />
+            </g>
+            <!-- Lower Left Smaller Leaflet -->
+            <g transform="translate(62, 159) rotate(-28) scale(0.65)">
+              <path d="M0 0 C-18 -14 -44 -10 -50 4 C-40 16 -16 18 0 4 Z" fill="url(#botanicalLeaf)" stroke="#d4af37" stroke-width="0.9" stroke-opacity="0.6" />
+              <path d="M-2 2 Q-24 0 -47 4" stroke="#d4af37" stroke-width="0.8" stroke-opacity="0.55" fill="none" />
+            </g>
+
+            <!-- 3. Right Compound Serrated Leaf & Golden Veins -->
+            <g transform="translate(81, 174) rotate(10)">
+              <path d="M0 0 C18 -16 48 -12 55 5 C43 19 18 20 0 4 Z" fill="url(#botanicalLeaf)" stroke="#d4af37" stroke-width="0.9" stroke-opacity="0.7" />
+              <!-- Leaf Veins -->
+              <path d="M2 2 Q27 0 52 5" stroke="#d4af37" stroke-width="0.9" stroke-opacity="0.65" fill="none" />
+              <path d="M16 1 L25 -5 M28 1 L37 -4 M18 3 L28 9 M31 3 L40 9" stroke="#d4af37" stroke-width="0.6" stroke-opacity="0.5" fill="none" />
+            </g>
+
+            <!-- 4. Receptacle Cup & Reflexed Calyx Sepals -->
+            <path d="M68 98 Q80 114 92 98 Z" fill="#14381f" stroke="#d4af37" stroke-width="0.7" />
+            <path d="M72 99 C54 106 40 116 35 124 C46 116 58 109 74 103 Z" fill="url(#botanicalLeaf)" stroke="#d4af37" stroke-width="0.7" />
+            <path d="M88 99 C106 106 120 116 125 124 C114 116 102 109 86 103 Z" fill="url(#botanicalLeaf)" stroke="#d4af37" stroke-width="0.7" />
+            <path d="M66 95 C48 92 34 96 28 102 C40 99 54 98 68 98 Z" fill="#1e4620" stroke="#d4af37" stroke-width="0.6" />
+            <path d="M94 95 C112 92 126 96 132 102 C120 99 106 98 92 98 Z" fill="#1e4620" stroke="#d4af37" stroke-width="0.6" />
+
+            <!-- ========================================================= -->
+            <!-- 5. SCULPTED MULTI-LAYERED VELVET CRIMSON ROSE BLOOM       -->
+            <!-- ========================================================= -->
+            <!-- Back Outer Crown Petals -->
+            <path filter="url(#petalShadow)" d="M80 16 C52 10 32 28 36 54 C40 74 60 88 80 88 C100 88 120 74 124 54 C128 28 108 10 80 16 Z" fill="url(#velvetDeep)" />
+
+            <!-- Far Left Reflexed Outer Petal -->
+            <path filter="url(#petalShadow)" d="M52 30 C24 32 14 58 26 78 C36 94 58 98 74 94 C62 80 48 56 52 30 Z" fill="url(#velvetMid)" stroke="#fda4af" stroke-width="0.5" stroke-opacity="0.4" />
+            <!-- Curled Velvet Lip on Left Outer Petal -->
+            <path d="M26 46 C18 58 20 72 30 82 C25 70 26 56 34 44 Z" fill="url(#velvetRimLight)" opacity="0.85" />
+
+            <!-- Far Right Reflexed Outer Petal -->
+            <path filter="url(#petalShadow)" d="M108 30 C136 32 146 58 134 78 C124 94 102 98 86 94 C98 80 112 56 108 30 Z" fill="url(#velvetMid)" stroke="#fda4af" stroke-width="0.5" stroke-opacity="0.4" />
+            <!-- Curled Velvet Lip on Right Outer Petal -->
+            <path d="M134 46 C142 58 140 72 130 82 C135 70 134 56 126 44 Z" fill="url(#velvetRimLight)" opacity="0.85" />
+
+            <!-- Bottom Wide Guard Petal -->
+            <path filter="url(#petalShadow)" d="M40 68 C46 96 64 104 80 104 C96 104 114 96 120 68 C106 84 92 90 80 90 C68 90 54 84 40 68 Z" fill="url(#velvetDeep)" stroke="#f5e6c8" stroke-width="0.5" stroke-opacity="0.35" />
+
+            <!-- Mid-Tier Left Cupped Petal -->
+            <path filter="url(#petalShadow)" d="M80 22 C54 18 36 38 42 64 C46 82 64 92 82 90 C70 76 62 48 80 22 Z" fill="url(#velvetMid)" stroke="#fecdd3" stroke-width="0.6" stroke-opacity="0.45" />
+
+            <!-- Mid-Tier Right Cupped Petal -->
+            <path filter="url(#petalShadow)" d="M80 22 C106 18 124 38 118 64 C114 82 96 92 78 90 C90 76 98 48 80 22 Z" fill="url(#velvetMid)" stroke="#fecdd3" stroke-width="0.6" stroke-opacity="0.45" />
+
+            <!-- Center-Front Overlapping Velvet Bowl Petal -->
+            <path filter="url(#petalShadow)" d="M46 54 C48 82 64 96 80 96 C96 96 112 82 114 54 C102 72 90 78 80 78 C70 78 58 72 46 54 Z" fill="url(#velvetRimLight)" stroke="#f5e6c8" stroke-width="0.6" stroke-opacity="0.5" />
+
+            <!-- Inner Tier Whorl — Left & Right Folding Petals -->
+            <path filter="url(#petalShadow)" d="M80 26 C58 26 48 44 54 62 C60 74 74 78 84 74 C72 64 68 42 80 26 Z" fill="url(#velvetHeart)" stroke="#fda4af" stroke-width="0.6" stroke-opacity="0.55" />
+            <path filter="url(#petalShadow)" d="M80 26 C102 26 112 44 106 62 C100 74 86 78 76 74 C88 64 92 42 80 26 Z" fill="url(#velvetHeart)" stroke="#fda4af" stroke-width="0.6" stroke-opacity="0.55" />
+
+            <!-- High-Centered Inner Bud Spiral (The Heart of the Rose) -->
+            <path filter="url(#petalShadow)" d="M60 46 C60 32 100 32 100 46 C100 64 80 72 80 72 C80 72 60 64 60 46 Z" fill="url(#velvetDeep)" stroke="#fecdd3" stroke-width="0.6" stroke-opacity="0.5" />
+            <path d="M65 44 C65 34 95 34 95 44 C95 56 80 63 80 63 C80 63 65 56 65 44 Z" fill="url(#velvetMid)" stroke="#fda4af" stroke-width="0.6" stroke-opacity="0.65" />
+            <path d="M70 42 C70 35 90 35 90 42 C90 50 80 55 80 55 C80 55 70 50 70 42 Z" fill="url(#velvetRimLight)" />
+            <!-- Tightly Coiled Center Pinwheel Vortex -->
+            <path d="M74 41 C76 37 85 37 86 42 C85 47 78 48 75 44 C77 41 82 40 83 43" stroke="#fecdd3" stroke-width="1.2" stroke-linecap="round" fill="#881337" />
+
+            <!-- 6. Realistic Crystal Dewdrops on Velvet Petals -->
+            <g transform="translate(45, 62)">
+              <ellipse cx="0" cy="0" rx="2.8" ry="3.6" transform="rotate(-20)" fill="url(#dewDropGrad)" />
+              <circle cx="-0.8" cy="-1.2" r="0.9" fill="#ffffff" />
+            </g>
+            <g transform="translate(103, 52)">
+              <ellipse cx="0" cy="0" rx="2.2" ry="2.8" transform="rotate(15)" fill="url(#dewDropGrad)" />
+              <circle cx="-0.6" cy="-0.9" r="0.7" fill="#ffffff" />
+            </g>
+          </g>
+        </defs>
+
+        <!-- Render Master Botanical Rose -->
+        <use href="#botanical-rose-artwork" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN CONTENT WRAPPER                                                  -->
+  <!-- ===================================================================== -->
+  <main id="main-content" class="relative z-10 origin-top">
+
+    <!-- =================================================================== -->
+    <!-- 5.1 HERO SECTION                                                    -->
+    <!-- =================================================================== -->
+    <section id="hero" class="relative min-h-screen flex flex-col items-center justify-center px-6 py-24 text-center overflow-hidden">
+      <!-- Radial Crimson Spotlight -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-velvet/20 rounded-full blur-[130px] pointer-events-none"></div>
+
+      <!-- Ornate Gold Arch Frame -->
+      <div id="hero-card" class="relative max-w-3xl w-full mx-auto px-6 sm:px-14 py-14 sm:py-20 rounded-t-[220px] rounded-b-2xl border border-champagne/35 bg-obsidian/65 backdrop-blur-md shadow-crimson-glow">
+        <!-- Inner Thin Gold Line -->
+        <div class="absolute inset-3 rounded-t-[210px] rounded-b-xl border border-champagne/15 pointer-events-none"></div>
+
+        <!-- Couple Monogram Crest -->
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full border border-champagne/50 bg-gradient-to-b from-velvet-dark/60 to-obsidian mb-6 shadow-gold-glow">
+          <span class="font-serif text-2xl tracking-wider gold-gradient-text">Z &amp; A</span>
+        </div>
+
+        <p class="text-xs sm:text-sm uppercase tracking-[0.38em] text-champagne/80 mb-4">
+          In The Name Of Love &amp; Eternity
+        </p>
+
+        <h1 class="font-serif text-5xl sm:text-7xl md:text-8xl gold-gradient-text font-normal tracking-tight leading-none my-4">
+          Zayn <span class="font-editorial italic font-light text-velvet-glow text-4xl sm:text-6xl align-middle mx-1">&amp;</span> Alizeh
+        </h1>
+
+        <div class="flex items-center justify-center gap-4 my-6">
+          <span class="w-16 h-[1px] bg-gradient-to-r from-transparent to-champagne/60"></span>
+          <svg class="w-4 h-4 text-velvet-glow" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" />
+          </svg>
+          <span class="w-16 h-[1px] bg-gradient-to-l from-transparent to-champagne/60"></span>
+        </div>
+
+        <blockquote class="font-editorial italic text-xl sm:text-2xl text-silver/90 max-w-xl mx-auto leading-relaxed">
+          &ldquo;Two souls woven in velvet night and golden light, destined to bloom together like a crimson rose.&rdquo;
+        </blockquote>
+
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs uppercase tracking-[0.25em] text-champagne-light">
+          <span class="px-4 py-2 rounded-full border border-champagne/25 bg-white/[0.02]">Saturday, Dec 12, 2026</span>
+          <span class="px-4 py-2 rounded-full border border-velvet-ruby/40 bg-velvet-dark/25 text-rose-200">The Grand Ciragan Palace</span>
+        </div>
+      </div>
+
+      <!-- Animated Scroll Down Indicator -->
+      <a href="#our-story" class="mt-10 flex flex-col items-center gap-2 text-champagne/75 hover:text-champagne transition-colors group">
+        <span class="text-[10px] uppercase tracking-[0.32em]">Follow The Rose</span>
+        <div class="w-6 h-10 rounded-full border border-champagne/40 flex justify-center p-1">
+          <span class="w-1.5 h-2.5 rounded-full bg-velvet-glow animate-bounce"></span>
+        </div>
+      </a>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 5.2 OUR STORY / TIMELINE SECTION                                    -->
+    <!-- =================================================================== -->
+    <section id="our-story" class="relative py-24 sm:py-32 px-6 max-w-6xl mx-auto">
+      <!-- Section Heading -->
+      <div class="text-center max-w-2xl mx-auto mb-20 reveal-up">
+        <span class="text-xs uppercase tracking-[0.35em] text-velvet-glow font-medium">Chapters of Us</span>
+        <h2 class="font-serif text-4xl sm:text-5xl gold-gradient-text mt-2">Our Love Story</h2>
+        <p class="font-editorial italic text-lg sm:text-xl text-silver/80 mt-3">
+          Every petal tells a memory that brought us to forever.
+        </p>
+      </div>
+
+      <!-- Vertical Timeline Container -->
+      <div class="relative">
+        <!-- Central Gold/Crimson Vertical Line -->
+        <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] md:-translate-x-1/2 bg-gradient-to-b from-transparent via-champagne/45 to-transparent"></div>
+
+        <!-- Milestone 1: How We Met -->
+        <div class="timeline-item relative flex flex-col md:flex-row items-start md:items-center justify-between mb-16 md:mb-24 pl-12 md:pl-0">
+          <!-- Center Node -->
+          <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-obsidian border-2 border-champagne flex items-center justify-center shadow-crimson-glow z-10">
+            <span class="w-2.5 h-2.5 rounded-full bg-velvet-glow"></span>
+          </div>
+
+          <div class="md:w-[45%] md:text-right md:pr-10">
+            <div class="luxury-card p-6 sm:p-8 rounded-2xl">
+              <span class="inline-block text-[11px] uppercase tracking-[0.25em] text-champagne px-3 py-1 rounded-full bg-champagne/10 border border-champagne/25 mb-3">
+                Autumn &bull; October 2022
+              </span>
+              <h3 class="font-serif text-2xl sm:text-3xl text-champagne-light mb-2">How We Met</h3>
+              <p class="text-sm text-silver/80 leading-relaxed">
+                Amidst the candlelit tables of an art gallery evening in Dubai, a shared conversation over espresso and classical poetry turned a fleeting introduction into an unforgettable four-hour dialogue.
+              </p>
+            </div>
+          </div>
+
+          <div class="md:w-[45%] mt-6 md:mt-0 md:pl-10 w-full">
+            <div class="relative rounded-2xl overflow-hidden border border-champagne/30 group aspect-[16/10] bg-charcoal">
+              <img
+                src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80"
+                alt="How We Met — Candlelit evening"
+                class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/30 to-transparent"></div>
+              <span class="absolute bottom-4 left-4 font-editorial italic text-champagne-light text-lg">“First glance under golden chandeliers”</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestone 2: The Proposal -->
+        <div class="timeline-item relative flex flex-col md:flex-row-reverse items-start md:items-center justify-between mb-16 md:mb-24 pl-12 md:pl-0">
+          <!-- Center Node -->
+          <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-obsidian border-2 border-champagne flex items-center justify-center shadow-crimson-glow z-10">
+            <span class="w-2.5 h-2.5 rounded-full bg-velvet-glow"></span>
+          </div>
+
+          <div class="md:w-[45%] md:text-left md:pl-10">
+            <div class="luxury-card p-6 sm:p-8 rounded-2xl">
+              <span class="inline-block text-[11px] uppercase tracking-[0.25em] text-champagne px-3 py-1 rounded-full bg-champagne/10 border border-champagne/25 mb-3">
+                Winter &bull; February 2025
+              </span>
+              <h3 class="font-serif text-2xl sm:text-3xl text-champagne-light mb-2">The Velvet Proposal</h3>
+              <p class="text-sm text-silver/80 leading-relaxed">
+                On a private terrace overlooking the Bosphorus covered in a thousand deep crimson roses and flickering lanterns, Zayn knelt with a family heirloom ring and asked Alizeh to be his forever.
+              </p>
+            </div>
+          </div>
+
+          <div class="md:w-[45%] mt-6 md:mt-0 md:pr-10 w-full">
+            <div class="relative rounded-2xl overflow-hidden border border-champagne/30 group aspect-[16/10] bg-charcoal">
+              <img
+                src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80"
+                alt="The Velvet Proposal"
+                class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/30 to-transparent"></div>
+              <span class="absolute bottom-4 left-4 font-editorial italic text-champagne-light text-lg">“A thousand crimson petals &amp; one whispered Yes”</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestone 3: Forever Begins -->
+        <div class="timeline-item relative flex flex-col md:flex-row items-start md:items-center justify-between pl-12 md:pl-0">
+          <!-- Center Node -->
+          <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-obsidian border-2 border-champagne flex items-center justify-center shadow-crimson-glow z-10">
+            <span class="w-2.5 h-2.5 rounded-full bg-velvet-glow"></span>
+          </div>
+
+          <div class="md:w-[45%] md:text-right md:pr-10">
+            <div class="luxury-card p-6 sm:p-8 rounded-2xl">
+              <span class="inline-block text-[11px] uppercase tracking-[0.25em] text-champagne px-3 py-1 rounded-full bg-champagne/10 border border-champagne/25 mb-3">
+                December 12, 2026
+              </span>
+              <h3 class="font-serif text-2xl sm:text-3xl text-champagne-light mb-2">Forever Begins</h3>
+              <p class="text-sm text-silver/80 leading-relaxed">
+                Surrounded by those we cherish most, we unite our families and step into a new chapter of love, laughter, and timeless devotion.
+              </p>
+            </div>
+          </div>
+
+          <div class="md:w-[45%] mt-6 md:mt-0 md:pl-10 w-full">
+            <div class="relative rounded-2xl overflow-hidden border border-champagne/30 group aspect-[16/10] bg-charcoal">
+              <img
+                src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=900&q=80"
+                alt="Forever Begins"
+                class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/30 to-transparent"></div>
+              <span class="absolute bottom-4 left-4 font-editorial italic text-champagne-light text-lg">“And so our symphony begins”</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 5.3 EVENTS & ITINERARY SECTION                                      -->
+    <!-- =================================================================== -->
+    <section id="events" class="relative py-24 sm:py-32 px-6 max-w-6xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-16 reveal-up">
+        <span class="text-xs uppercase tracking-[0.35em] text-velvet-glow font-medium">The Royal Celebrations</span>
+        <h2 class="font-serif text-4xl sm:text-5xl gold-gradient-text mt-2">Events &amp; Itinerary</h2>
+        <p class="font-editorial italic text-lg sm:text-xl text-silver/80 mt-3">
+          Three enchanted moments curated for an unforgettable evening.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Event Card 1: The Sacred Nikah -->
+        <div class="luxury-card rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden group reveal-up">
+          <div class="absolute -right-10 -top-10 w-32 h-32 bg-velvet/15 rounded-full blur-2xl group-hover:bg-velvet/30 transition-all"></div>
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <span class="text-xs uppercase tracking-[0.25em] text-champagne font-medium">Part I &bull; 04:30 PM</span>
+              <div class="w-10 h-10 rounded-full border border-champagne/40 flex items-center justify-center text-champagne">
+                <!-- Rings Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <circle cx="9" cy="12" r="5" />
+                  <circle cx="15" cy="12" r="5" />
+                </svg>
+              </div>
+            </div>
+
+            <h3 class="font-serif text-2xl sm:text-3xl text-champagne-light mb-3">The Sacred Nikah</h3>
+            <p class="text-sm text-silver/80 leading-relaxed mb-6">
+              Witness the sacred vows and blessings in the Marble Courtyard overlooking the water, accompanied by live oud and harp melodies.
+            </p>
+          </div>
+
+          <div class="pt-6 border-t border-white/10 space-y-2.5 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="uppercase tracking-widest text-silver/60">Venue</span>
+              <span class="text-champagne-light font-medium">The Sultan Marble Hall</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="uppercase tracking-widest text-silver/60">Dress Code</span>
+              <span class="text-rose-300 font-medium">Ivory, Champagne &amp; Gold</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Card 2: Velvet Soirée & Reception -->
+        <div class="luxury-card rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden group border-champagne/50 shadow-crimson-glow reveal-up">
+          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-champagne via-velvet-glow to-champagne"></div>
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <span class="text-xs uppercase tracking-[0.25em] text-velvet-glow font-semibold">Part II &bull; 06:30 PM</span>
+              <div class="w-10 h-10 rounded-full border border-velvet-glow/50 bg-velvet/20 flex items-center justify-center text-champagne-light">
+                <!-- Goblet/Sparkle Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                </svg>
+              </div>
+            </div>
+
+            <h3 class="font-serif text-2xl sm:text-3xl text-champagne-light mb-3">The Grand Reception</h3>
+            <p class="text-sm text-silver/80 leading-relaxed mb-6">
+              The couple’s grand entrance under a canopy of crimson roses, followed by a seven-course royal banquet and heartfelt toasts.
+            </p>
+          </div>
+
+          <div class="pt-6 border-t border-white/10 space-y-2.5 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="uppercase tracking-widest text-silver/60">Venue</span>
+              <span class="text-champagne-light font-medium">Imperial Velvet Ballroom</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="uppercase tracking-widest text-silver/60">Dress Code</span>
+              <span class="text-rose-300 font-medium">Black Tie &amp; Crimson Accents</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Card 3: Starlight Gala -->
+        <div class="luxury-card rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden group reveal-up">
+          <div class="absolute -right-10 -top-10 w-32 h-32 bg-champagne/10 rounded-full blur-2xl group-hover:bg-champagne/25 transition-all"></div>
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <span class="text-xs uppercase tracking-[0.25em] text-champagne font-medium">Part III &bull; 09:30 PM</span>
+              <div class="w-10 h-10 rounded-full border border-champagne/40 flex items-center justify-center text-champagne">
+                <!-- Music/Stars Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                </svg>
+              </div>
+            </div>
+
+            <h3 class="font-serif text-2xl sm:text-3xl text-champagne-light mb-3">Midnight Celebration Gala</h3>
+            <p class="text-sm text-silver/80 leading-relaxed mb-6">
+              First dance beneath golden fireworks, live orchestral fusion, midnight artisan desserts, and dancing into the starlit night.
+            </p>
+          </div>
+
+          <div class="pt-6 border-t border-white/10 space-y-2.5 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="uppercase tracking-widest text-silver/60">Venue</span>
+              <span class="text-champagne-light font-medium">Bosphorus Terrace Lounge</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="uppercase tracking-widest text-silver/60">Highlight</span>
+              <span class="text-rose-300 font-medium">Midnight Fireworks Finale</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 4. INTERACTIVE DATE SCRATCH-OFF CARD SECTION                        -->
+    <!-- =================================================================== -->
+    <section id="scratch-section" class="relative py-24 sm:py-32 px-6 max-w-4xl mx-auto">
+      <div class="text-center max-w-xl mx-auto mb-12 reveal-up">
+        <span class="text-xs uppercase tracking-[0.35em] text-velvet-glow font-medium">Interactive Keepsake</span>
+        <h2 class="font-serif text-4xl sm:text-5xl gold-gradient-text mt-2">Reveal the Date</h2>
+        <p class="font-editorial italic text-lg text-silver/80 mt-2">
+          Gently scratch the golden foil below with your finger or cursor to unveil our wedding date.
+        </p>
+      </div>
+
+      <!-- Scratch Card Wrapper -->
+      <div
+        id="scratch-card-box"
+        class="relative mx-auto max-w-xl rounded-2xl p-[2px] bg-gradient-to-br from-champagne via-velvet-ruby to-champagne shadow-crimson-glow overflow-hidden reveal-up"
+      >
+        <div id="scratch-inner-card" class="relative bg-obsidian rounded-2xl p-8 sm:p-12 text-center overflow-hidden select-none">
+          <!-- Hidden Revealed Details Layer Underneath -->
+          <div id="scratch-revealed-content" class="relative z-10 flex flex-col items-center justify-center">
+            <span class="text-[11px] uppercase tracking-[0.35em] text-velvet-glow font-semibold mb-2">Save Our Special Day</span>
+            <h3 class="font-serif text-3xl sm:text-5xl gold-gradient-text font-semibold tracking-wide">
+              December 12, 2026
+            </h3>
+            <p class="font-editorial italic text-xl text-champagne-light mt-2">
+              Saturday Evening at Four Thirty O&rsquo;Clock
+            </p>
+            <p class="text-xs uppercase tracking-[0.25em] text-silver/70 mt-1">
+              Ciragan Palace Kempinski &bull; Istanbul
+            </p>
+
+            <!-- Calendar Action Buttons -->
+            <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+              <a
+                id="google-cal-link"
+                href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Zayn+%26+Alizeh%27s+Wedding+Celebration&dates=20261212T163000Z/20261212T235900Z&details=Join+us+for+the+Black+%26+Velvet+Crimson+Rose+Wedding+Celebration+of+Zayn+%26+Alizeh.&location=Ciragan+Palace+Kempinski+Istanbul"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-velvet to-velvet-ruby text-champagne-light text-xs uppercase tracking-[0.18em] border border-champagne/40 hover:brightness-110 transition-all shadow-md"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Add to Google Calendar
+              </a>
+
+              <button
+                id="apple-cal-btn"
+                type="button"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-champagne-light text-xs uppercase tracking-[0.18em] border border-champagne/35 transition-all"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Apple / Outlook (.ics)
+              </button>
+            </div>
+          </div>
+
+          <!-- Top HTML5 Scratch Canvas Overlay -->
+          <canvas
+            id="scratch-canvas"
+            class="absolute inset-0 w-full h-full z-20 cursor-crosshair touch-none transition-opacity duration-700"
+          ></canvas>
+        </div>
+      </div>
+
+      <!-- Progress / Reset helper bar -->
+      <div class="mt-4 flex items-center justify-center gap-4 text-xs text-silver/60">
+        <span id="scratch-status-text">Scratch progress: 0%</span>
+        <span>&bull;</span>
+        <button id="reset-scratch-btn" type="button" class="text-champagne hover:underline uppercase tracking-widest text-[11px]">
+          Reset Foil
+        </button>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 5.5 INTERACTIVE VENUE & MAP SECTION                                 -->
+    <!-- =================================================================== -->
+    <section id="venue" class="relative py-24 sm:py-32 px-6 max-w-6xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-16 reveal-up">
+        <span class="text-xs uppercase tracking-[0.35em] text-velvet-glow font-medium">Destination &amp; Sanctuary</span>
+        <h2 class="font-serif text-4xl sm:text-5xl gold-gradient-text mt-2">The Venue</h2>
+        <p class="font-editorial italic text-lg sm:text-xl text-silver/80 mt-3">
+          Where imperial palace grandeur meets the dark romance of the Bosphorus.
+        </p>
+      </div>
+
+      <div class="luxury-card rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 border border-champagne/35 reveal-up">
+        <!-- Venue Details Column -->
+        <div class="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-between">
+          <div>
+            <span class="inline-block text-[10px] uppercase tracking-[0.3em] text-champagne px-3 py-1 rounded-full border border-champagne/30 bg-champagne/5 mb-4">
+              Imperial Waterfront Palace
+            </span>
+            <h3 class="font-serif text-3xl sm:text-4xl text-champagne-light mb-4">
+              &Ccedil;&#305;ra&#287;an Palace Kempinski
+            </h3>
+            <p class="text-sm text-silver/80 leading-relaxed mb-6">
+              Set along the European shores of the Bosphorus, the historic 17th-century Ottoman Imperial Palace welcomes our guests with private yacht arrivals, valet service, and candlelit courtyard gardens.
+            </p>
+
+            <!-- Address Box -->
+            <div class="p-4 rounded-xl bg-white/[0.03] border border-white/10 mb-6">
+              <p class="text-xs uppercase tracking-[0.2em] text-champagne mb-1">Official Address</p>
+              <p id="venue-address-text" class="text-sm text-silver/90">
+                Y&#305;ld&#305;z, &Ccedil;&#305;ra&#287;an Cd. No:32, 34349 Be&#351;ikta&#351; / &#304;stanbul, T&uuml;rkiye
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons: Copy Address & Google Maps -->
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <button
+              id="copy-address-btn"
+              type="button"
+              class="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-champagne/40 text-champagne-light text-xs uppercase tracking-[0.2em] transition-all"
+            >
+              <svg class="w-4 h-4 text-champagne" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span id="copy-address-label">Copy Address</span>
+            </button>
+
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Ciragan+Palace+Kempinski+Istanbul"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-velvet to-velvet-ruby text-champagne-light text-xs uppercase tracking-[0.2em] border border-champagne/40 shadow-crimson-glow hover:brightness-110 transition-all"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Get Directions
+            </a>
+          </div>
+        </div>
+
+        <!-- Dark-Styled Interactive Map Visual Column -->
+        <div class="lg:col-span-6 relative min-h-[340px] bg-charcoal overflow-hidden flex items-center justify-center border-t lg:border-t-0 lg:border-l border-champagne/25">
+          <!-- Dark Filtered OpenStreetMap / Google Embed + Custom Pin Overlay -->
+          <iframe
+            title="Venue Location Map"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=29.0050%2C41.0380%2C29.0260%2C41.0500&amp;layer=mapnik&amp;marker=41.0438%2C29.0156"
+            class="absolute inset-0 w-full h-full opacity-55 contrast-125 invert hue-rotate-180 saturate-50"
+            loading="lazy"
+          ></iframe>
+          <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-obsidian/60 pointer-events-none"></div>
+
+          <!-- Floating Luxury Pin Card Overlay -->
+          <div class="relative z-10 pointer-events-none bg-obsidian/90 backdrop-blur-md border border-champagne/50 px-5 py-3.5 rounded-2xl shadow-crimson-glow flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-full bg-velvet flex items-center justify-center text-champagne-light shadow-md">
+              <svg class="w-5 h-5 animate-bounce" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+            </div>
+            <div class="text-left">
+              <p class="font-serif text-sm text-champagne-light">Ciragan Palace Gardens</p>
+              <p class="text-[11px] text-silver/70">41.0438&deg; N, 29.0156&deg; E &bull; Valet &amp; Yacht Pier</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 5.6 RSVP GLASSMORPHISM FORM SECTION                                 -->
+    <!-- =================================================================== -->
+    <section id="rsvp" class="relative py-24 sm:py-32 px-6 max-w-3xl mx-auto">
+      <div class="text-center mb-14 reveal-up">
+        <span class="text-xs uppercase tracking-[0.35em] text-velvet-glow font-medium">Répondez S’il Vous Plaît</span>
+        <h2 class="font-serif text-4xl sm:text-5xl gold-gradient-text mt-2">Confirm Your Presence</h2>
+        <p class="font-editorial italic text-lg sm:text-xl text-silver/80 mt-2">
+          Kindly respond by November 1st, 2026 so we may prepare your royal welcome.
+        </p>
+      </div>
+
+      <div class="luxury-card rounded-3xl p-8 sm:p-12 border border-champagne/35 relative overflow-hidden reveal-up">
+        <form id="rsvp-form" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Full Name -->
+            <div>
+              <label for="guest-name" class="block text-xs uppercase tracking-[0.2em] text-champagne-light mb-2">
+                Full Name *
+              </label>
+              <input
+                id="guest-name"
+                name="name"
+                type="text"
+                required
+                placeholder="e.g., Lady Layla Al-Hashimi"
+                class="w-full px-4 py-3.5 rounded-xl bg-white/[0.04] border border-champagne/30 text-white placeholder-silver/40 text-sm focus:outline-none focus:border-champagne transition-colors"
+              />
+            </div>
+
+            <!-- Guest Count -->
+            <div>
+              <label for="guest-count" class="block text-xs uppercase tracking-[0.2em] text-champagne-light mb-2">
+                Number of Guests *
+              </label>
+              <select
+                id="guest-count"
+                name="guests"
+                class="w-full px-4 py-3.5 rounded-xl bg-charcoal border border-champagne/30 text-white text-sm focus:outline-none focus:border-champagne transition-colors"
+              >
+                <option value="1">1 Guest (Seat Reserved)</option>
+                <option value="2" selected>2 Guests (Couple)</option>
+                <option value="3">3 Guests (Family)</option>
+                <option value="4">4 Guests (Family)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Attendance Radio Cards -->
+          <div>
+            <span class="block text-xs uppercase tracking-[0.2em] text-champagne-light mb-3">
+              Will You Join Us? *
+            </span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label class="relative flex items-center gap-3 p-4 rounded-xl border border-champagne/35 bg-white/[0.03] cursor-pointer hover:border-champagne transition-all">
+                <input type="radio" name="attendance" value="attending" checked class="accent-velvet-ruby w-4 h-4" />
+                <div>
+                  <span class="block font-serif text-base text-champagne-light">Joyfully Attending</span>
+                  <span class="text-[11px] text-silver/60">Count me in for the celebration</span>
+                </div>
+              </label>
+
+              <label class="relative flex items-center gap-3 p-4 rounded-xl border border-white/15 bg-white/[0.02] cursor-pointer hover:border-champagne/50 transition-all">
+                <input type="radio" name="attendance" value="declining" class="accent-velvet-ruby w-4 h-4" />
+                <div>
+                  <span class="block font-serif text-base text-silver">Regretfully Cannot</span>
+                  <span class="text-[11px] text-silver/60">Sending warm blessings from afar</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Dietary & Wishes Message -->
+          <div>
+            <label for="guest-message" class="block text-xs uppercase tracking-[0.2em] text-champagne-light mb-2">
+              Dietary Requirements &amp; Wishes for the Couple
+            </label>
+            <textarea
+              id="guest-message"
+              name="message"
+              rows="3"
+              placeholder="Share any dietary preferences or a heartfelt blessing for Zayn & Alizeh..."
+              class="w-full px-4 py-3.5 rounded-xl bg-white/[0.04] border border-champagne/30 text-white placeholder-silver/40 text-sm focus:outline-none focus:border-champagne transition-colors"
+            ></textarea>
+          </div>
+
+          <!-- Submit CTA -->
+          <button
+            type="submit"
+            class="w-full py-4 rounded-full bg-gradient-to-r from-velvet-dark via-velvet-ruby to-velvet-dark border border-champagne/50 text-champagne-light font-medium text-xs uppercase tracking-[0.3em] shadow-crimson-glow hover:brightness-110 transition-all"
+          >
+            Seal &amp; Send RSVP
+          </button>
+        </form>
+
+        <!-- Confirmation Message State (Hidden initially) -->
+        <div id="rsvp-success" class="hidden text-center py-8 space-y-4">
+          <div class="w-16 h-16 rounded-full bg-velvet/30 border border-champagne mx-auto flex items-center justify-center text-champagne-light shadow-gold-glow">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 class="font-serif text-3xl gold-gradient-text">Your Response Is Sealed</h3>
+          <p id="rsvp-summary-text" class="font-editorial italic text-xl text-silver/90 max-w-md mx-auto"></p>
+          <button
+            id="rsvp-edit-btn"
+            type="button"
+            class="text-xs uppercase tracking-[0.25em] text-champagne hover:underline pt-2"
+          >
+            Update Response
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 5.7 FOOTER / FINALE: COUNTDOWN & GROOM-BRIDE ROSE HANDOFF CLIMAX    -->
+    <!-- =================================================================== -->
+    <footer id="finale-footer" class="relative pt-20 pb-28 px-6 border-t border-champagne/20 overflow-hidden">
+      <!-- Deep Velvet Glow at Footer Base -->
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-velvet/25 rounded-full blur-[140px] pointer-events-none"></div>
+
+      <div class="max-w-4xl mx-auto text-center relative z-10">
+        <!-- Countdown Timer -->
+        <span class="text-xs uppercase tracking-[0.35em] text-champagne/80">Counting Every Heartbeat</span>
+        <div id="countdown-grid" class="grid grid-cols-4 gap-3 sm:gap-6 max-w-xl mx-auto my-8">
+          <div class="luxury-card py-4 px-2 rounded-2xl border border-champagne/30">
+            <span id="cd-days" class="block font-serif text-3xl sm:text-5xl gold-gradient-text">00</span>
+            <span class="text-[10px] uppercase tracking-[0.25em] text-silver/70 mt-1 block">Days</span>
+          </div>
+          <div class="luxury-card py-4 px-2 rounded-2xl border border-champagne/30">
+            <span id="cd-hours" class="block font-serif text-3xl sm:text-5xl gold-gradient-text">00</span>
+            <span class="text-[10px] uppercase tracking-[0.25em] text-silver/70 mt-1 block">Hours</span>
+          </div>
+          <div class="luxury-card py-4 px-2 rounded-2xl border border-champagne/30">
+            <span id="cd-mins" class="block font-serif text-3xl sm:text-5xl gold-gradient-text">00</span>
+            <span class="text-[10px] uppercase tracking-[0.25em] text-silver/70 mt-1 block">Minutes</span>
+          </div>
+          <div class="luxury-card py-4 px-2 rounded-2xl border border-champagne/30">
+            <span id="cd-secs" class="block font-serif text-3xl sm:text-5xl gold-gradient-text">00</span>
+            <span class="text-[10px] uppercase tracking-[0.25em] text-silver/70 mt-1 block">Seconds</span>
+          </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- 3. FOOTER CLIMAX STAGE: GROOM & BRIDE ROSE HANDOFF              -->
+        <!-- =============================================================== -->
+        <div class="mt-16 mb-10">
+          <p id="climax-status-banner" class="font-editorial italic text-xl sm:text-2xl text-champagne-light mb-4">
+            &ldquo;The rose has journeyed through our story to reach her heart...&rdquo;
+          </p>
+
+          <!-- Couple Stage Box -->
+          <div
+            id="couple-stage"
+            class="relative mx-auto max-w-2xl h-80 sm:h-96 rounded-3xl border border-champagne/35 bg-gradient-to-b from-white/[0.02] via-velvet-dark/15 to-velvet-dark/35 backdrop-blur-md flex items-end justify-center pb-5 px-6 shadow-crimson-glow overflow-visible"
+          >
+            <!-- Ambient Romantic Arch Backdrop Behind Couple -->
+            <div class="absolute inset-x-12 top-6 bottom-6 rounded-t-full border border-champagne/20 bg-radial from-velvet/15 to-transparent pointer-events-none"></div>
+
+            <!-- Floor Golden Stage Line -->
+            <div class="absolute bottom-5 left-10 right-10 h-[1.5px] bg-gradient-to-r from-transparent via-champagne/75 to-transparent"></div>
+
+            <!-- Glowing Floating Hearts Above Couple (Revealed on Handoff) -->
+            <div id="couple-hearts" class="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-4 opacity-0 transition-opacity duration-700 pointer-events-none z-20">
+              <svg class="w-6 h-6 text-velvet-glow floating-heart" style="animation-delay: 0.1s" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <svg class="w-9 h-9 text-rose-500 floating-heart" style="animation-delay: 0.45s" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <svg class="w-6 h-6 text-champagne floating-heart" style="animation-delay: 0.85s" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </div>
+
+            <!-- Detailed Editorial Luxury Groom & Bride Characters SVG -->
+            <svg id="couple-svg" viewBox="0 0 460 300" class="w-full max-w-[440px] h-64 sm:h-80 overflow-visible relative z-10">
+              <defs>
+                <!-- Warm Natural Skin Tone Gradient -->
+                <linearGradient id="skinToneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fde8d7" />
+                  <stop offset="65%" stop-color="#f3c6a8" />
+                  <stop offset="100%" stop-color="#dba382" />
+                </linearGradient>
+
+                <!-- Bespoke Midnight Black & Satin Tuxedo Gradient -->
+                <linearGradient id="groomSuit" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#2c2c30" />
+                  <stop offset="45%" stop-color="#151518" />
+                  <stop offset="100%" stop-color="#070709" />
+                </linearGradient>
+
+                <!-- Satin Lapel Sheen -->
+                <linearGradient id="satinLapel" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#3f3f46" />
+                  <stop offset="50%" stop-color="#18181b" />
+                  <stop offset="100%" stop-color="#09090b" />
+                </linearGradient>
+
+                <!-- Couture Ivory-Champagne & Gold Bridal Gown Gradient -->
+                <linearGradient id="brideGown" x1="20%" y1="0%" x2="80%" y2="100%">
+                  <stop offset="0%" stop-color="#fffdf9" />
+                  <stop offset="45%" stop-color="#f8ebd4" />
+                  <stop offset="82%" stop-color="#e5c78c" />
+                  <stop offset="100%" stop-color="#b88e35" />
+                </linearGradient>
+
+                <!-- Crimson Velvet Sash & Accents -->
+                <linearGradient id="crimsonVelvetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f43f5e" />
+                  <stop offset="50%" stop-color="#be123c" />
+                  <stop offset="100%" stop-color="#4c0519" />
+                </linearGradient>
+
+                <!-- Rich Espresso Wavy Hair Gradient -->
+                <linearGradient id="darkHairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#3b2820" />
+                  <stop offset="45%" stop-color="#1c1310" />
+                  <stop offset="100%" stop-color="#0c0807" />
+                </linearGradient>
+              </defs>
+
+              <!-- ========================================================= -->
+              <!-- GROOM CHARACTER (LEFT, FACING BRIDE)                      -->
+              <!-- ========================================================= -->
+              <g id="groom-character" transform="translate(88, 18)">
+                <!-- Ground Shadow -->
+                <ellipse cx="48" cy="274" rx="34" ry="5" fill="rgba(0,0,0,0.65)" />
+
+                <!-- Stationary Tailored Tuxedo Trousers & Polished Oxford Shoes -->
+                <g id="groom-lower-body">
+                  <!-- Back Leg (Right Leg) -->
+                  <path d="M50 166 L64 166 L61 258 L48 258 Z" fill="#0d0d10" stroke="#27272a" stroke-width="0.8" />
+                  <!-- Front Leg (Left Leg) with Gold-Satin Side Galon Stripe -->
+                  <path d="M32 166 L49 166 L46 260 L33 260 Z" fill="#141418" stroke="#d4af37" stroke-width="0.6" stroke-opacity="0.5" />
+                  <line x1="39" y1="168" x2="38" y2="258" stroke="#d4af37" stroke-width="0.9" stroke-opacity="0.55" />
+
+                  <!-- Back Oxford Dress Shoe -->
+                  <path d="M48 257 L62 257 C69 257 76 261 75 266 L47 266 Z" fill="#09090b" stroke="#d4af37" stroke-width="0.7" />
+                  <!-- Front Oxford Dress Shoe with Glossy Toe Cap -->
+                  <path d="M32 259 L47 259 C55 259 63 263 62 269 L31 269 Z" fill="#111115" stroke="#d4af37" stroke-width="0.9" />
+                  <path d="M49 261 Q57 262 59 266" stroke="#f5e6c8" stroke-width="0.8" stroke-opacity="0.6" fill="none" />
+                </g>
+
+                <!-- Articulated Upper Body & Head (Pivots at Waist for Gentleman's Bow) -->
+                <g id="groom-upper-body" style="transform-origin: 46px 166px;">
+                  <!-- Relaxed Left Arm at Side -->
+                  <path d="M26 88 C16 112 18 140 25 162" stroke="url(#groomSuit)" stroke-width="13" stroke-linecap="round" fill="none" />
+                  <circle cx="26" cy="166" r="5.5" fill="url(#skinToneGrad)" />
+
+                  <!-- Sculpted Tailored Tuxedo Jacket Torso -->
+                  <path d="M22 84 C22 75 34 72 47 72 C60 72 70 76 72 86 L68 170 C54 173 38 173 25 170 Z" fill="url(#groomSuit)" stroke="#d4af37" stroke-width="0.9" stroke-opacity="0.65" />
+
+                  <!-- Crisp Pleated White Dress Shirt Bib -->
+                  <path d="M41 73 L59 75 L54 128 L43 108 Z" fill="#fffdf9" stroke="#e5e7eb" stroke-width="0.5" />
+                  <!-- Gold Shirt Studs -->
+                  <circle cx="51" cy="92" r="1.3" fill="#d4af37" />
+                  <circle cx="52" cy="102" r="1.3" fill="#d4af37" />
+                  <circle cx="52.5" cy="112" r="1.3" fill="#d4af37" />
+
+                  <!-- Silk Satin Peak Lapel -->
+                  <path d="M38 73 L54 128 L41 118 L34 86 Z" fill="url(#satinLapel)" stroke="#d4af37" stroke-width="0.7" stroke-opacity="0.7" />
+                  <path d="M59 75 L64 92 L54 128 Z" fill="url(#satinLapel)" stroke="#d4af37" stroke-width="0.5" stroke-opacity="0.5" />
+
+                  <!-- Wingtip Collar & Velvet Crimson Bow Tie -->
+                  <path d="M39 71 L49 77 L58 72 L55 66 L41 66 Z" fill="#ffffff" />
+                  <g transform="translate(51, 76)">
+                    <path d="M-7 -4 L0 -1 L-7 4 Z" fill="url(#crimsonVelvetGrad)" />
+                    <path d="M7 -4 L0 -1 L7 4 Z" fill="url(#crimsonVelvetGrad)" />
+                    <circle cx="0" cy="-0.5" r="2.2" fill="#e11d48" stroke="#d4af37" stroke-width="0.5" />
+                  </g>
+
+                  <!-- Crimson Rose Boutonniere & Gold Pocket Square on Chest -->
+                  <path d="M57 98 L65 95 L63 102 Z" fill="#f5e6c8" stroke="#d4af37" stroke-width="0.5" />
+                  <circle cx="46" cy="94" r="3.5" fill="#e11d48" stroke="#f5e6c8" stroke-width="0.5" />
+                  <circle cx="46" cy="94" r="1.8" fill="#881337" />
+
+                  <!-- Neck -->
+                  <path d="M40 56 L54 58 L54 72 L39 70 Z" fill="url(#skinToneGrad)" />
+                  <!-- Subtle Jaw Shadow on Neck -->
+                  <path d="M42 59 Q49 63 54 60" stroke="#c58c6d" stroke-width="1.5" fill="none" opacity="0.6" />
+
+                  <!-- Sculpted Groom Head (3/4 Profile Facing Right) -->
+                  <g id="groom-head">
+                    <!-- Face Contour with Defined Jawline -->
+                    <path d="M31 32 C31 16 62 16 64 33 C65 40 67 43 66 46 C64 49 63 55 59 59 C54 63 42 62 36 56 C31 51 31 41 31 32 Z" fill="url(#skinToneGrad)" stroke="#d4af37" stroke-width="0.6" stroke-opacity="0.45" />
+
+                    <!-- Sculpted Ear -->
+                    <path d="M34 38 C30 37 29 45 34 47" fill="url(#skinToneGrad)" stroke="#c58c6d" stroke-width="0.9" />
+
+                    <!-- Styled Voluminous Wavy Dark Hair -->
+                    <path d="M28 36 C25 22 33 11 48 11 C61 11 70 18 67 27 C62 23 55 21 47 23 C41 24 38 29 36 35 C34 38 33 43 31 45 C29 43 28 39 28 36 Z" fill="url(#darkHairGrad)" />
+                    <!-- Hair Texture Highlight -->
+                    <path d="M35 19 Q48 14 61 20" stroke="#f5e6c8" stroke-width="0.8" stroke-opacity="0.3" fill="none" />
+
+                    <!-- Expressive Eyebrow & Eye Facing Bride -->
+                    <path d="M52 33 Q58 31 62 34" stroke="#1c1310" stroke-width="1.6" stroke-linecap="round" fill="none" />
+                    <ellipse cx="57" cy="37.5" rx="2.2" ry="1.8" fill="#ffffff" />
+                    <circle cx="57.6" cy="37.5" r="1.4" fill="#1c1310" />
+                    <circle cx="58.1" cy="37" r="0.5" fill="#ffffff" />
+
+                    <!-- Subtle Groom Beard/Jaw Contour & Warm Smile -->
+                    <path d="M51 49 Q56 53 60 49.5" stroke="#99001f" stroke-width="1.4" stroke-linecap="round" fill="none" />
+                  </g>
+
+                  <!-- Articulated Right Arm Extending Rose to Bride -->
+                  <g id="groom-arm" style="transform-origin: 45px 90px;">
+                    <!-- Upper & Forearm Sleeve -->
+                    <path d="M43 90 Q64 114 96 104" stroke="url(#groomSuit)" stroke-width="12" stroke-linecap="round" fill="none" />
+                    <path d="M43 90 Q64 114 96 104" stroke="#d4af37" stroke-width="0.8" stroke-opacity="0.55" stroke-linecap="round" fill="none" />
+                    <!-- Crisp White French Cuff & Gold Cufflink -->
+                    <path d="M94 101 L101 100 L102 107 L95 108 Z" fill="#ffffff" />
+                    <circle cx="98" cy="104" r="1.2" fill="#d4af37" />
+
+                    <!-- Groom Sculpted Hand (Docking Target for Floating Rose) -->
+                    <g id="groom-hand-target" transform="translate(105, 103)">
+                      <ellipse cx="0" cy="0" rx="6" ry="4.2" transform="rotate(-12)" fill="url(#skinToneGrad)" stroke="#c58c6d" stroke-width="0.6" />
+                      <path d="M-2 -3 Q3 -6 6 -2" stroke="url(#skinToneGrad)" stroke-width="2.2" stroke-linecap="round" fill="none" />
+                    </g>
+
+                    <!-- Docked Botanical Rose in Groom's Hand (Revealed when Floating Rose Docks) -->
+                    <g id="handoff-rose" opacity="0" transform="translate(86, 48) rotate(16) scale(0.32)">
+                      <use href="#botanical-rose-artwork" />
+                    </g>
+                  </g>
+                </g>
+              </g>
+
+              <!-- ========================================================= -->
+              <!-- BRIDE CHARACTER (RIGHT, FACING GROOM)                     -->
+              <!-- ========================================================= -->
+              <g id="bride-character" transform="translate(248, 22)">
+                <!-- Ground Shadow under Gown Train -->
+                <ellipse cx="56" cy="270" rx="54" ry="6" fill="rgba(0,0,0,0.65)" />
+
+                <!-- Cascading Translucent Cathedral Veil with Gold Lace Trim -->
+                <g id="bride-veil">
+                  <path d="M62 22 C96 42 122 128 134 264 C112 270 88 266 74 248 C78 165 72 82 62 22 Z" fill="rgba(245, 230, 200, 0.16)" stroke="#d4af37" stroke-width="0.9" stroke-dasharray="3 2" />
+                  <path d="M66 28 C90 56 108 140 116 258" stroke="#f5e6c8" stroke-width="0.6" stroke-opacity="0.35" fill="none" />
+                </g>
+
+                <!-- Couture Bridal Ballgown & Flared Skirt Train -->
+                <g id="bride-gown-group">
+                  <!-- Flared A-Line / Ballgown Skirt -->
+                  <path d="M36 126 C20 168 6 222 -2 266 C36 273 84 273 122 265 C106 218 86 168 68 126 Z" fill="url(#brideGown)" stroke="#d4af37" stroke-width="1.1" />
+
+                  <!-- Couture Silk Skirt Pleats & Gold Filigree Hem -->
+                  <path d="M42 128 C32 175 22 225 16 268" stroke="#d4af37" stroke-width="0.7" stroke-opacity="0.5" fill="none" />
+                  <path d="M52 128 C50 175 50 225 48 270" stroke="#d4af37" stroke-width="0.7" stroke-opacity="0.5" fill="none" />
+                  <path d="M62 128 C72 175 84 225 94 267" stroke="#d4af37" stroke-width="0.7" stroke-opacity="0.5" fill="none" />
+                  <path d="M2 260 Q60 269 118 259" stroke="#d4af37" stroke-width="1.2" stroke-dasharray="2 3" fill="none" />
+
+                  <!-- Sweetheart Fitted Corset Bodice -->
+                  <path d="M34 82 C38 76 46 80 51 84 C56 80 64 76 68 82 L68 127 C56 131 46 131 36 127 Z" fill="url(#brideGown)" stroke="#d4af37" stroke-width="1" />
+                  <!-- Gold Embroidery Lace on Bodice -->
+                  <path d="M40 90 Q52 98 64 90 M42 104 Q52 112 62 104" stroke="#d4af37" stroke-width="0.8" stroke-opacity="0.65" fill="none" />
+
+                  <!-- Deep Velvet Crimson Waist Sash & Ribbon Bow -->
+                  <path d="M35 123 Q52 130 69 123 L68 130 Q52 137 36 130 Z" fill="url(#crimsonVelvetGrad)" stroke="#d4af37" stroke-width="0.5" />
+                  <path d="M62 127 C70 144 76 168 80 192" stroke="url(#crimsonVelvetGrad)" stroke-width="4.5" stroke-linecap="round" fill="none" />
+                </g>
+
+                <!-- Graceful Neck, Collarbone & Ruby-Diamond Necklace -->
+                <path d="M37 78 C39 70 45 68 46 58 L58 58 C59 68 65 70 67 78 C58 84 46 84 37 78 Z" fill="url(#skinToneGrad)" />
+                <!-- Diamond & Crimson Ruby Pendant Necklace -->
+                <path d="M43 70 Q51 77 60 70" stroke="#f5e6c8" stroke-width="1" fill="none" />
+                <circle cx="51" cy="75" r="2.2" fill="#e11d48" stroke="#d4af37" stroke-width="0.6" />
+
+                <!-- Sculpted Bride Head (3/4 Profile Facing Groom) -->
+                <g id="bride-head">
+                  <!-- Back Voluminous Chignon Updo -->
+                  <circle cx="66" cy="34" r="15" fill="url(#darkHairGrad)" />
+                  <circle cx="72" cy="40" r="10" fill="url(#darkHairGrad)" />
+                  <!-- Gold Hair Pearls in Bun -->
+                  <circle cx="63" cy="26" r="1.4" fill="#f5e6c8" />
+                  <circle cx="68" cy="32" r="1.4" fill="#d4af37" />
+                  <circle cx="65" cy="39" r="1.4" fill="#f5e6c8" />
+
+                  <!-- Feminine Sculpted Face Contour -->
+                  <path d="M35 33 C35 18 65 18 65 35 C65 48 56 60 45 60 C38 60 34 52 33 45 C31 42 33 38 35 33 Z" fill="url(#skinToneGrad)" stroke="#d4af37" stroke-width="0.5" stroke-opacity="0.4" />
+
+                  <!-- Sweeping Bridal Hair Framing Face & Soft Tendril Curl -->
+                  <path d="M34 30 C36 14 64 13 68 29 C58 21 44 21 34 30 Z" fill="url(#darkHairGrad)" />
+                  <path d="M56 24 C63 32 61 48 65 56" stroke="url(#darkHairGrad)" stroke-width="2.5" stroke-linecap="round" fill="none" />
+
+                  <!-- Royal Gold & Ruby Bridal Tiara Crown -->
+                  <path d="M39 21 L43 11 L48 18 L53 9 L58 18 L62 13 L64 22 Z" fill="#d4af37" stroke="#f5e6c8" stroke-width="0.7" />
+                  <circle cx="53" cy="14" r="1.6" fill="#e11d48" />
+                  <circle cx="44" cy="16" r="1.1" fill="#f5e6c8" />
+                  <circle cx="60" cy="17" r="1.1" fill="#f5e6c8" />
+
+                  <!-- Pearl & Gold Drop Earring -->
+                  <line x1="59" y1="45" x2="59" y2="51" stroke="#d4af37" stroke-width="1" />
+                  <circle cx="59" cy="52.5" r="2.2" fill="#fffdf9" stroke="#d4af37" stroke-width="0.6" />
+
+                  <!-- Expressive Brow, Long Eyelashes & Eye Facing Groom -->
+                  <path d="M37 33 Q42 31 47 34" stroke="#1c1310" stroke-width="1.3" stroke-linecap="round" fill="none" />
+                  <ellipse cx="42" cy="38" rx="2.3" ry="1.8" fill="#ffffff" />
+                  <circle cx="41.4" cy="38" r="1.4" fill="#1c1310" />
+                  <circle cx="41" cy="37.4" r="0.5" fill="#ffffff" />
+                  <!-- Curved Eyelashes -->
+                  <path d="M39.5 37 L37.5 35.5 M40.5 36.3 L39 34.8" stroke="#1c1310" stroke-width="0.9" stroke-linecap="round" />
+
+                  <!-- Glowing Rosy Blush Cheek (Intensifies on Receiving Rose) -->
+                  <ellipse id="bride-blush" cx="44" cy="44" rx="5.2" ry="3.2" fill="#fb7185" opacity="0.28" />
+
+                  <!-- Soft Velvet Crimson Smiling Lips -->
+                  <path d="M36 49.5 Q40 53 44 49.5" stroke="#be123c" stroke-width="1.6" stroke-linecap="round" fill="none" />
+                </g>
+
+                <!-- Articulated Bride Arm Reaching Out & Holding Rose to Her Heart -->
+                <g id="bride-arm" style="transform-origin: 48px 88px;">
+                  <!-- Sheer Off-Shoulder Lace Sleeve Puff -->
+                  <ellipse cx="48" cy="89" rx="7" ry="5" fill="rgba(245, 230, 200, 0.45)" stroke="#d4af37" stroke-width="0.7" />
+                  <!-- Graceful Arm & Forearm -->
+                  <path d="M47 90 Q30 116 4 104" stroke="url(#skinToneGrad)" stroke-width="7.5" stroke-linecap="round" fill="none" />
+                  <!-- Gold Bracelet on Wrist -->
+                  <line x1="9" y1="102" x2="7" y2="108" stroke="#d4af37" stroke-width="1.6" />
+
+                  <!-- Bride Sculpted Hand -->
+                  <g id="bride-hand-target" transform="translate(1, 103)">
+                    <ellipse cx="0" cy="0" rx="5.2" ry="3.6" transform="rotate(14)" fill="url(#skinToneGrad)" stroke="#c58c6d" stroke-width="0.5" />
+                  </g>
+
+                  <!-- Botanical Rose Held Close by Bride After Handoff -->
+                  <g id="bride-received-rose" opacity="0" transform="translate(-26, 46) rotate(-14) scale(0.34)">
+                    <use href="#botanical-rose-artwork" />
+                  </g>
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Replay Climax Animation Button -->
+          <div class="mt-5">
+            <button
+              id="replay-climax-btn"
+              type="button"
+              class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 hover:bg-velvet/30 border border-champagne/35 text-champagne-light text-[11px] uppercase tracking-[0.22em] transition-all"
+            >
+              <svg class="w-3.5 h-3.5 text-velvet-glow" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+              </svg>
+              Replay Rose Handoff &amp; Celebration
+            </button>
+          </div>
+        </div>
+
+        <!-- Closing Monogram & Romantic Note -->
+        <div class="pt-10 border-t border-white/10">
+          <h3 class="font-serif text-3xl gold-gradient-text mb-2">Zayn &amp; Alizeh</h3>
+          <p class="font-editorial italic text-lg text-silver/75">
+            #ZaynAndAlizehForever &bull; Black &amp; Velvet Crimson Rose Edition
+          </p>
+          <p class="text-[11px] uppercase tracking-[0.3em] text-silver/40 mt-6">
+            Crafted with Love &bull; December 12, 2026
+          </p>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- INTERACTIVE APPLICATION JAVASCRIPT                                    -->
+  <!-- ===================================================================== -->
+  <script src="script.js"></script>
+</body>
+</html>
